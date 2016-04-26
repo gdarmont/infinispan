@@ -148,8 +148,17 @@ public abstract class AbstractRemoteCacheManagerFactory {
     * @param asyncExecutorFactory
     * @see org.infinispan.spring.ConfigurationPropertiesOverrides#setAsyncExecutorFactory(java.lang.String)
     */
+   @Deprecated
    public void setAsyncExecutorFactory(final String asyncExecutorFactory) {
-      this.configurationPropertiesOverrides.setAsyncExecutorFactory(asyncExecutorFactory);
+      setExecutorFactory(asyncExecutorFactory);
+   }
+
+   /**
+    * @param executorFactory
+    * @see org.infinispan.spring.ConfigurationPropertiesOverrides#setAsyncExecutorFactory(java.lang.String)
+    */
+   public void setExecutorFactory(final String executorFactory) {
+      this.configurationPropertiesOverrides.setExecutorFactory(executorFactory);
    }
 
    /**

@@ -35,13 +35,13 @@ import org.infinispan.util.logging.LogFactory;
 public class RemoteStoreConfigurationBuilder extends AbstractStoreConfigurationBuilder<RemoteStoreConfiguration, RemoteStoreConfigurationBuilder> implements
       RemoteStoreConfigurationChildBuilder<RemoteStoreConfigurationBuilder> {
    private static final Log log = LogFactory.getLog(RemoteStoreConfigurationBuilder.class, Log.class);
-   private final ExecutorFactoryConfigurationBuilder asyncExecutorFactory;
+   private final ExecutorFactoryConfigurationBuilder executorFactory;
    private final ConnectionPoolConfigurationBuilder connectionPool;
    private List<RemoteServerConfigurationBuilder> servers = new ArrayList<RemoteServerConfigurationBuilder>();
 
    public RemoteStoreConfigurationBuilder(PersistenceConfigurationBuilder builder) {
       super(builder, RemoteStoreConfiguration.attributeDefinitionSet());
-      asyncExecutorFactory = new ExecutorFactoryConfigurationBuilder(this);
+      executorFactory = new ExecutorFactoryConfigurationBuilder(this);
       connectionPool = new ConnectionPoolConfigurationBuilder(this);
    }
 
@@ -50,9 +50,18 @@ public class RemoteStoreConfigurationBuilder extends AbstractStoreConfigurationB
       return this;
    }
 
+   /**
+    * @deprecated Use {@link #executorFactory()} instead
+    */
    @Override
+   @Deprecated
    public ExecutorFactoryConfigurationBuilder asyncExecutorFactory() {
-      return asyncExecutorFactory;
+      return executorFactory();
+   }
+
+   @Override
+   public ExecutorFactoryConfigurationBuilder executorFactory() {
+      return executorFactory;
    }
 
    @Override
@@ -165,13 +174,13 @@ public class RemoteStoreConfigurationBuilder extends AbstractStoreConfigurationB
          remoteServers.add(server.create());
       }
       attributes.attribute(SERVERS).set(remoteServers);
-      return new RemoteStoreConfiguration(attributes.protect(), async.create(), singletonStore.create(), asyncExecutorFactory.create(), connectionPool.create());
+      return new RemoteStoreConfiguration(attributes.protect(), async.create(), singletonStore.create(), executorFactory.create(), connectionPool.create());
    }
 
    @Override
    public RemoteStoreConfigurationBuilder read(RemoteStoreConfiguration template) {
       super.read(template);
-      this.asyncExecutorFactory.read(template.asyncExecutorFactory());
+      this.executorFactory.read(template.executorFactory());
       this.connectionPool.read(template.connectionPool());
       for (RemoteServerConfiguration server : template.servers()) {
          this.addServer().host(server.host()).port(server.port());
@@ -183,7 +192,7 @@ public class RemoteStoreConfigurationBuilder extends AbstractStoreConfigurationB
    @Override
    public void validate() {
       this.connectionPool.validate();
-      this.asyncExecutorFactory.validate();
+      this.executorFactory.validate();
       for (RemoteServerConfigurationBuilder server : servers) {
          server.validate();
       }

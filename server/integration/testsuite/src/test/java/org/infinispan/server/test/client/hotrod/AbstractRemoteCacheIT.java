@@ -98,7 +98,7 @@ public abstract class AbstractRemoteCacheIT {
                         // FIXME Workaround for ISPN-6367
                 .marshaller(new GenericJBossMarshaller(Thread.currentThread().getContextClassLoader()))
                         // executors
-                .asyncExecutorFactory().factoryClass("org.infinispan.client.hotrod.impl.async.DefaultAsyncExecutorFactory")
+                .executorFactory().factoryClass("org.infinispan.client.hotrod.impl.executors.DefaultExecutorFactory")
                 .addExecutorProperty("infinispan.client.hotrod.default_executor_factory.pool_size", "10")
                 .addExecutorProperty("infinispan.client.hotrod.default_executor_factory.queue_size", "100000")
                         //hashing

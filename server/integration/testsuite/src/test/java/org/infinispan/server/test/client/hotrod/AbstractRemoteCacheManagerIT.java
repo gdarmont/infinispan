@@ -70,7 +70,7 @@ public abstract class AbstractRemoteCacheManagerIT {
                 .tcpKeepAlive(true)
                 .transportFactory("org.infinispan.server.test.client.hotrod.HotRodTestTransportFactory")
                 .marshaller("org.infinispan.server.test.client.hotrod.HotRodTestMarshaller")
-                .asyncExecutorFactory().factoryClass("org.infinispan.server.test.client.hotrod.HotRodTestExecutorFactory")
+                .executorFactory().factoryClass("org.infinispan.server.test.client.hotrod.HotRodTestExecutorFactory")
                 .addExecutorProperty("infinispan.client.hotrod.default_executor_factory.pool_size", "20")
                 .addExecutorProperty("infinispan.client.hotrod.default_executor_factory.queue_size", "200000")
                 .keySizeEstimate(128)
@@ -122,7 +122,7 @@ public abstract class AbstractRemoteCacheManagerIT {
                 .tcpNoDelay(true)
                 .transportFactory("org.infinispan.client.hotrod.impl.transport.tcp.TcpTransportFactory")
                 .marshaller("org.infinispan.commons.marshall.jboss.GenericJBossMarshaller")
-                .asyncExecutorFactory().factoryClass("org.infinispan.client.hotrod.impl.async.DefaultAsyncExecutorFactory")
+                .executorFactory().factoryClass("org.infinispan.client.hotrod.impl.executors.DefaultExecutorFactory")
                 .addExecutorProperty("infinispan.client.hotrod.default_executor_factory.pool_size", "10")
                 .addExecutorProperty("infinispan.client.hotrod.default_executor_factory.queue_size", "100000")
                 .keySizeEstimate(64)
@@ -358,8 +358,8 @@ public abstract class AbstractRemoteCacheManagerIT {
         assertEquals(config.maxRetries(), Integer.parseInt(getMaxRetries(rc)));
 
         // asyncExecutorFactory compared only with the configuration itself
-        assertEquals(config.asyncExecutorFactory().factoryClass().getName(),
-                rc.getRemoteCacheManager().getConfiguration().asyncExecutorFactory().factoryClass().getName());
+        assertEquals(config.executorFactory().factoryClass().getName(),
+                rc.getRemoteCacheManager().getConfiguration().executorFactory().factoryClass().getName());
 
         assertEquals(config.transportFactory().getName(), getTransportFactoryProperty(rc));
         // either marshaller or marshallerClass is set

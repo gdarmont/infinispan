@@ -20,13 +20,22 @@
               </xs:documentation>
             </xs:annotation>
           </xs:element>
-          <xs:element name="async-executor" type="tns:executorFactory" minOccurs="0">
-            <xs:annotation>
-              <xs:documentation>
-                Configuration for the executor service used for asynchronous work on the Transport, including asynchronous marshalling and Cache 'async operations' such as Cache.putAsync().
-              </xs:documentation>
-            </xs:annotation>
-          </xs:element>
+          <xs:choice minOccurs="0">
+            <xs:element name="executor" type="tns:executorFactory" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                  Configuration for the executor service used for asynchronous or parallel work on the Transport, including asynchronous marshalling, Cache 'async operations' such as Cache.putAsync() or cache parallel operations like putAll().
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="async-executor" type="tns:executorFactory" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                  Deprecated. Use executor tag instead. Configuration for the executor service used for asynchronous work on the Transport, including asynchronous marshalling and Cache 'async operations' such as Cache.putAsync().
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:choice>
         </xs:sequence>
         <xs:attribute name="socket-timeout" type="xs:long" default="60000">
           <xs:annotation>

@@ -34,8 +34,18 @@ public interface ConfigurationChildBuilder {
    /**
     * Configuration for the executor service used for asynchronous work on the Transport, including
     * asynchronous marshalling and Cache 'async operations' such as Cache.putAsync().
+    *
+    * @deprecated Will be removed in a future version. Use {@link #executorFactory()} instead.
     */
+   @Deprecated
    ExecutorFactoryConfigurationBuilder asyncExecutorFactory();
+
+   /**
+    * Configuration for the executor service used for asynchronous or parallel work on the Transport, including
+    * asynchronous marshalling, Cache 'async operations' such as Cache.putAsync() or cache parallel operations
+    * like putAll().
+    */
+   ExecutorFactoryConfigurationBuilder executorFactory();
 
    /**
     * For replicated (vs distributed) Hot Rod server clusters, the client balances requests to the

@@ -18,7 +18,7 @@
                           key-size-estimate="62" value-size-estimate="512" force-return-values="false">
                <remote-server host="127.0.0.1" port="19711" outbound-socket-binding="hotrod-server-1" />
                <connection-pool max-active="99" max-idle="97" max-total="98"/>
-               <async-executor factory="org.infinispan.client.hotrod.impl.async.DefaultAsyncExecutorFactory">
+               <async-executor factory="org.infinispan.client.hotrod.impl.executors.DefaultExecutorFactory">
                   <property name="pool_size">1</property>
                   <property name="queue_size">10000</property>
                </async-executor>

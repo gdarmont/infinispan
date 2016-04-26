@@ -36,8 +36,14 @@ public abstract class AbstractConfigurationChildBuilder implements Configuration
    }
 
    @Override
+   @Deprecated
    public ExecutorFactoryConfigurationBuilder asyncExecutorFactory() {
-      return builder.asyncExecutorFactory();
+      return executorFactory();
+   }
+
+   @Override
+   public ExecutorFactoryConfigurationBuilder executorFactory() {
+      return builder.executorFactory();
    }
 
    @Override

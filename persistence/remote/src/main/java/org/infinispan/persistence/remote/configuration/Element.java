@@ -14,6 +14,8 @@ public enum Element {
     UNKNOWN(null),
 
     CACHE("cache"),
+    TRANSPORT_EXECUTOR("executor"),
+    @Deprecated
     ASYNC_TRANSPORT_EXECUTOR("async-executor"),
     CONNECTION_POOL("connection-pool"),
     PROPERTIES("properties"),

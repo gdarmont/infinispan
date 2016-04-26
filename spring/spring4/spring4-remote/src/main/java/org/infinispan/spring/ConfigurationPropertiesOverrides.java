@@ -56,10 +56,18 @@ public class ConfigurationPropertiesOverrides {
    }
 
    /**
+    * @param executorFactory
+    */
+   public void setExecutorFactory(final String executorFactory) {
+      this.overridingProperties.setProperty(EXECUTOR_FACTORY, executorFactory);
+   }
+
+   /**
     * @param asyncExecutorFactory
     */
+   @Deprecated
    public void setAsyncExecutorFactory(final String asyncExecutorFactory) {
-      this.overridingProperties.setProperty(ASYNC_EXECUTOR_FACTORY, asyncExecutorFactory);
+      setExecutorFactory(asyncExecutorFactory);
    }
 
    /**

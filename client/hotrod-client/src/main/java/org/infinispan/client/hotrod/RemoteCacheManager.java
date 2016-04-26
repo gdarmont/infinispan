@@ -68,7 +68,7 @@ public class RemoteCacheManager implements RemoteCacheContainer {
 
    private Marshaller marshaller;
    protected TransportFactory transportFactory;
-   private ExecutorService asyncExecutorService;
+   private ExecutorService executorService;
    protected ClientListenerNotifier listenerNotifier;
 
    /**
@@ -112,9 +112,11 @@ public class RemoteCacheManager implements RemoteCacheContainer {
    @Deprecated
    public Properties getProperties() {
       Properties properties = new Properties();
-      if (configuration.asyncExecutorFactory().factoryClass() != null) {
-         properties.setProperty(ConfigurationProperties.ASYNC_EXECUTOR_FACTORY, configuration.asyncExecutorFactory().factoryClass().getName());
-         TypedProperties aefProps = configuration.asyncExecutorFactory().properties();
+      if (configuration.executorFactory().factoryClass() != null) {
+         String executorFactoryName = configuration.executorFactory().factoryClass().getName();
+         properties.setProperty(ConfigurationProperties.EXECUTOR_FACTORY, executorFactoryName);
+         properties.setProperty(ConfigurationProperties.ASYNC_EXECUTOR_FACTORY, executorFactoryName);
+         TypedProperties aefProps = configuration.executorFactory().properties();
          for(String key : Arrays.asList(ConfigurationProperties.DEFAULT_EXECUTOR_FACTORY_POOL_SIZE, ConfigurationProperties.DEFAULT_EXECUTOR_FACTORY_QUEUE_SIZE)) {
             if (aefProps.containsKey(key)) {
                properties.setProperty(key, aefProps.getProperty(key));
@@ -252,12 +254,12 @@ public class RemoteCacheManager implements RemoteCacheContainer {
 
       codec = CodecFactory.getCodec(configuration.protocolVersion());
 
-      if (asyncExecutorService == null) {
-         ExecutorFactory executorFactory = configuration.asyncExecutorFactory().factory();
+      if (executorService == null) {
+         ExecutorFactory executorFactory = configuration.executorFactory().factory();
          if (executorFactory == null) {
-            executorFactory = Util.getInstance(configuration.asyncExecutorFactory().factoryClass());
+            executorFactory = Util.getInstance(configuration.executorFactory().factoryClass());
          }
-         asyncExecutorService = executorFactory.getExecutor(configuration.asyncExecutorFactory().properties());
+         executorService = executorFactory.getExecutor(configuration.executorFactory().properties());
       }
 
       listenerNotifier = ClientListenerNotifier.create(codec, marshaller);
@@ -285,7 +287,7 @@ public class RemoteCacheManager implements RemoteCacheContainer {
       if (isStarted()) {
          listenerNotifier.stop();
          transportFactory.destroy();
-         asyncExecutorService.shutdownNow();
+         executorService.shutdownNow();
       }
       started = false;
    }
@@ -361,8 +363,8 @@ public class RemoteCacheManager implements RemoteCacheContainer {
       RemoteCacheImpl<?, ?> remoteCache = remoteCacheHolder.remoteCache;
       OperationsFactory operationsFactory = new OperationsFactory(
               transportFactory, remoteCache.getName(), remoteCacheHolder.forceReturnValue, codec, listenerNotifier,
-            asyncExecutorService);
-      remoteCache.init(marshaller, asyncExecutorService, operationsFactory, configuration.keySizeEstimate(), configuration.valueSizeEstimate());
+            executorService);
+      remoteCache.init(marshaller, executorService, operationsFactory, configuration.keySizeEstimate(), configuration.valueSizeEstimate());
    }
 
    @Override

@@ -91,7 +91,7 @@ public class ConfigurationPropertiesOverridesTest {
 
    @Test
    public final void testIfSetAsyncExecutorFactoryOverridesDefaultAsyncExecutorFactory() {
-      final String expectedAsyncExecutorFactory = "test.AsyncExecutorFactor";
+      final String expectedAsyncExecutorFactory = "test.CustomExecutorFactory";
       final ConfigurationPropertiesOverrides objectUnderTest = new ConfigurationPropertiesOverrides();
 
       objectUnderTest.setAsyncExecutorFactory(expectedAsyncExecutorFactory);
@@ -99,9 +99,9 @@ public class ConfigurationPropertiesOverridesTest {
             .override(this.defaultConfigurationProperties);
 
       assertEquals("override(" + this.defaultConfigurationProperties
-                         + ") should have overridden property 'transportFactory'. However, it didn't.",
+                         + ") should have overridden property 'executorFactory'. However, it didn't.",
                    expectedAsyncExecutorFactory,
-                   overriddenConfigurationProperties.getProperty(ASYNC_EXECUTOR_FACTORY));
+                   overriddenConfigurationProperties.getProperty(EXECUTOR_FACTORY));
    }
 
    @Test

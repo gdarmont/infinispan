@@ -23,9 +23,15 @@ public abstract class AbstractRemoteStoreConfigurationChildBuilder<S> extends Ab
       return builder.addServer();
    }
 
+   @Deprecated
    @Override
    public ExecutorFactoryConfigurationBuilder asyncExecutorFactory() {
-      return builder.asyncExecutorFactory();
+      return executorFactory();
+   }
+
+   @Override
+   public ExecutorFactoryConfigurationBuilder executorFactory() {
+      return builder.executorFactory();
    }
 
    @Override

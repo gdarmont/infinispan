@@ -60,10 +60,10 @@ public class RemoteStoreConfiguration extends AbstractStoreConfiguration {
    private final Attribute<Boolean> tcpNoDelay;
    private final Attribute<String> transportFactory;
    private final ConnectionPoolConfiguration connectionPool;
-   private final ExecutorFactoryConfiguration asyncExecutorFactory;
+   private final ExecutorFactoryConfiguration executorFactory;
 
    public RemoteStoreConfiguration(AttributeSet attributes, AsyncStoreConfiguration async, SingletonStoreConfiguration singletonStore,
-                                   ExecutorFactoryConfiguration asyncExecutorFactory, ConnectionPoolConfiguration connectionPool) {
+                                   ExecutorFactoryConfiguration executorFactory, ConnectionPoolConfiguration connectionPool) {
       super(attributes, async, singletonStore);
       balancingStrategy = attributes.attribute(BALANCING_STRATEGY);
       connectionTimeout = attributes.attribute(CONNECTION_TIMEOUT);
@@ -79,12 +79,20 @@ public class RemoteStoreConfiguration extends AbstractStoreConfiguration {
       socketTimeout = attributes.attribute(SOCKET_TIMEOUT);
       tcpNoDelay = attributes.attribute(TCP_NO_DELAY);
       transportFactory = attributes.attribute(TRANSPORT_FACTORY);
-      this.asyncExecutorFactory = asyncExecutorFactory;
+      this.executorFactory = executorFactory;
       this.connectionPool = connectionPool;
    }
 
+   public ExecutorFactoryConfiguration executorFactory() {
+      return executorFactory;
+   }
+
+   /**
+    * @deprecated Use {@link #executorFactory()} instead
+    */
+   @Deprecated
    public ExecutorFactoryConfiguration asyncExecutorFactory() {
-      return asyncExecutorFactory;
+      return executorFactory();
    }
 
    public String balancingStrategy() {

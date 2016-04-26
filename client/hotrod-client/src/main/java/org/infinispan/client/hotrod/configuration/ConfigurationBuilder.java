@@ -3,7 +3,6 @@ package org.infinispan.client.hotrod.configuration;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.impl.ConfigurationProperties;
 import org.infinispan.client.hotrod.impl.TypedProperties;
-import org.infinispan.client.hotrod.impl.async.DefaultAsyncExecutorFactory;
 import org.infinispan.client.hotrod.impl.consistenthash.ConsistentHash;
 import org.infinispan.client.hotrod.impl.consistenthash.ConsistentHashV2;
 import org.infinispan.client.hotrod.impl.consistenthash.SegmentConsistentHash;
@@ -44,7 +43,7 @@ public class ConfigurationBuilder implements ConfigurationChildBuilder, Builder<
          .compile("(\\[([0-9A-Fa-f:]+)\\]|([^:/?#]*))(?::(\\d*))?");
 
    private WeakReference<ClassLoader> classLoader;
-   private final ExecutorFactoryConfigurationBuilder asyncExecutorFactory;
+   private final ExecutorFactoryConfigurationBuilder executorFactory;
    private Class<? extends FailoverRequestBalancingStrategy> balancingStrategyClass = RoundRobinBalancingStrategy.class;
    private FailoverRequestBalancingStrategy balancingStrategy;
    private final ConnectionPoolConfigurationBuilder connectionPool;
@@ -73,7 +72,7 @@ public class ConfigurationBuilder implements ConfigurationChildBuilder, Builder<
    public ConfigurationBuilder() {
       this.classLoader = new WeakReference<ClassLoader>(Thread.currentThread().getContextClassLoader());
       this.connectionPool = new ConnectionPoolConfigurationBuilder(this);
-      this.asyncExecutorFactory = new ExecutorFactoryConfigurationBuilder(this);
+      this.executorFactory = new ExecutorFactoryConfigurationBuilder(this);
       this.security = new SecurityConfigurationBuilder(this);
       this.nearCache = new NearCacheConfigurationBuilder(this);
    }
@@ -114,8 +113,14 @@ public class ConfigurationBuilder implements ConfigurationChildBuilder, Builder<
    }
 
    @Override
+   @Deprecated
    public ExecutorFactoryConfigurationBuilder asyncExecutorFactory() {
-      return this.asyncExecutorFactory;
+      return executorFactory();
+   }
+
+   @Override
+   public ExecutorFactoryConfigurationBuilder executorFactory() {
+      return this.executorFactory;
    }
 
    @Override
@@ -268,10 +273,13 @@ public class ConfigurationBuilder implements ConfigurationChildBuilder, Builder<
    public ConfigurationBuilder withProperties(Properties properties) {
       TypedProperties typed = TypedProperties.toTypedProperties(properties);
 
-      if (typed.containsKey(ConfigurationProperties.ASYNC_EXECUTOR_FACTORY)) {
-         this.asyncExecutorFactory().factoryClass(typed.getProperty(ConfigurationProperties.ASYNC_EXECUTOR_FACTORY));
+      if (typed.containsKey(ConfigurationProperties.EXECUTOR_FACTORY)) {
+         this.executorFactory().factoryClass(typed.getProperty(ConfigurationProperties.EXECUTOR_FACTORY));
+      } else if (typed.containsKey(ConfigurationProperties.ASYNC_EXECUTOR_FACTORY)) {
+         log.warnf("Property %s is deprecated and will be remove in a future version. Use %s instead.", ConfigurationProperties.ASYNC_EXECUTOR_FACTORY, ConfigurationProperties.EXECUTOR_FACTORY);
+         this.executorFactory().factoryClass(typed.getProperty(ConfigurationProperties.ASYNC_EXECUTOR_FACTORY));
       }
-      this.asyncExecutorFactory().withExecutorProperties(typed);
+      this.executorFactory().withExecutorProperties(typed);
       this.balancingStrategy(typed.getProperty(ConfigurationProperties.REQUEST_BALANCING_STRATEGY, balancingStrategyClass.getName()));
       this.connectionPool.withPoolProperties(typed);
       this.connectionTimeout(typed.getIntProperty(ConfigurationProperties.CONNECT_TIMEOUT, connectionTimeout));
@@ -308,7 +316,7 @@ public class ConfigurationBuilder implements ConfigurationChildBuilder, Builder<
    @Override
    public void validate() {
       connectionPool.validate();
-      asyncExecutorFactory.validate();
+      executorFactory.validate();
       security.validate();
       nearCache.validate();
       if (maxRetries < 0) {
@@ -337,11 +345,11 @@ public class ConfigurationBuilder implements ConfigurationChildBuilder, Builder<
       List<ClusterConfiguration> serverClusterConfigs = clusters.stream()
          .map(ClusterConfigurationBuilder::create).collect(Collectors.toList());
       if (marshaller == null) {
-         return new Configuration(asyncExecutorFactory.create(), balancingStrategyClass, balancingStrategy, classLoader == null ? null : classLoader.get(), connectionPool.create(), connectionTimeout,
+         return new Configuration(executorFactory.create(), balancingStrategyClass, balancingStrategy, classLoader == null ? null : classLoader.get(), connectionPool.create(), connectionTimeout,
                consistentHashImpl, forceReturnValues, keySizeEstimate, marshallerClass, protocolVersion, servers, socketTimeout, security.create(), tcpNoDelay, tcpKeepAlive, transportFactory,
                valueSizeEstimate, maxRetries, nearCache.create(), serverClusterConfigs);
       } else {
-         return new Configuration(asyncExecutorFactory.create(), balancingStrategyClass, balancingStrategy, classLoader == null ? null : classLoader.get(), connectionPool.create(), connectionTimeout,
+         return new Configuration(executorFactory.create(), balancingStrategyClass, balancingStrategy, classLoader == null ? null : classLoader.get(), connectionPool.create(), connectionTimeout,
                consistentHashImpl, forceReturnValues, keySizeEstimate, marshaller, protocolVersion, servers, socketTimeout, security.create(), tcpNoDelay, tcpKeepAlive, transportFactory,
                valueSizeEstimate, maxRetries, nearCache.create(), serverClusterConfigs);
       }
@@ -362,7 +370,7 @@ public class ConfigurationBuilder implements ConfigurationChildBuilder, Builder<
    @Override
    public ConfigurationBuilder read(Configuration template) {
       this.classLoader = new WeakReference<ClassLoader>(template.classLoader());
-      this.asyncExecutorFactory.read(template.asyncExecutorFactory());
+      this.executorFactory.read(template.executorFactory());
       this.balancingStrategyClass = template.balancingStrategyClass();
       this.balancingStrategy = template.balancingStrategy();
       this.connectionPool.read(template.connectionPool());

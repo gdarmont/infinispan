@@ -9,9 +9,11 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.infinispan.client.hotrod.configuration.Configuration;
-import org.infinispan.client.hotrod.impl.async.DefaultAsyncExecutorFactory;
+import org.infinispan.client.hotrod.impl.executors.DefaultExecutorFactory;
 import org.infinispan.client.hotrod.impl.transport.tcp.RoundRobinBalancingStrategy;
 import org.infinispan.client.hotrod.impl.transport.tcp.TcpTransportFactory;
+import org.infinispan.client.hotrod.logging.Log;
+import org.infinispan.client.hotrod.logging.LogFactory;
 import org.infinispan.commons.marshall.jboss.GenericJBossMarshaller;
 
 /**
@@ -21,10 +23,18 @@ import org.infinispan.commons.marshall.jboss.GenericJBossMarshaller;
  * @version 4.1
  */
 public class ConfigurationProperties {
+   private static final Log log = LogFactory.getLog(ConfigurationProperties.class, Log.class);
+
    public static final String TRANSPORT_FACTORY = "infinispan.client.hotrod.transport_factory";
    public static final String SERVER_LIST = "infinispan.client.hotrod.server_list";
    public static final String MARSHALLER = "infinispan.client.hotrod.marshaller";
+
+   /**
+    * Use {@link #EXECUTOR_FACTORY} instead
+    */
+   @Deprecated
    public static final String ASYNC_EXECUTOR_FACTORY = "infinispan.client.hotrod.async_executor_factory";
+   public static final String EXECUTOR_FACTORY = "infinispan.client.hotrod.executor_factory";
    public static final String DEFAULT_EXECUTOR_FACTORY_POOL_SIZE = "infinispan.client.hotrod.default_executor_factory.pool_size";
    public static final String TCP_NO_DELAY = "infinispan.client.hotrod.tcp_no_delay";
    public static final String TCP_KEEP_ALIVE = "infinispan.client.hotrod.tcp_keep_alive";
@@ -106,8 +116,25 @@ public class ConfigurationProperties {
       return props.getProperty(MARSHALLER, GenericJBossMarshaller.class.getName());
    }
 
+   /**
+    * @deprecated Use {@link #getExecutorFactory()} instead
+    */
+   @Deprecated
    public String getAsyncExecutorFactory() {
-      return props.getProperty(ASYNC_EXECUTOR_FACTORY, DefaultAsyncExecutorFactory.class.getName());
+      return getExecutorFactory();
+   }
+
+   public String getExecutorFactory() {
+      String executorFactory = props.getProperty(EXECUTOR_FACTORY);
+      if (executorFactory == null) {
+         executorFactory = props.getProperty(ASYNC_EXECUTOR_FACTORY);
+         if (executorFactory != null) {
+            log.warnf("Property %s is deprecated and will be remove in a future version. Use %s instead.", ASYNC_EXECUTOR_FACTORY, EXECUTOR_FACTORY);
+         } else {
+            executorFactory = DefaultExecutorFactory.class.getName();
+         }
+      }
+      return executorFactory;
    }
 
    public int getDefaultExecutorFactoryPoolSize() {

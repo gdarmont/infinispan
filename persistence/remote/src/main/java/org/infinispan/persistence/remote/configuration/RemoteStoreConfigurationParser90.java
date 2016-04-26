@@ -63,8 +63,12 @@ public class RemoteStoreConfigurationParser90 implements ConfigurationParser {
       while (reader.hasNext() && (reader.nextTag() != XMLStreamConstants.END_ELEMENT)) {
          Element element = Element.forName(reader.getLocalName());
          switch (element) {
+            case TRANSPORT_EXECUTOR: {
+               parseTransportExecutor(reader, builder.executorFactory(), classLoader);
+               break;
+            }
             case ASYNC_TRANSPORT_EXECUTOR: {
-               parseAsyncTransportExecutor(reader, builder.asyncExecutorFactory(), classLoader);
+               parseTransportExecutor(reader, builder.asyncExecutorFactory(), classLoader);
                break;
             }
             case CONNECTION_POOL: {
@@ -84,8 +88,8 @@ public class RemoteStoreConfigurationParser90 implements ConfigurationParser {
       persistenceBuilder.addStore(builder);
    }
 
-   private void parseAsyncTransportExecutor(final XMLExtendedStreamReader reader,
-         final ExecutorFactoryConfigurationBuilder builder, ClassLoader classLoader) throws XMLStreamException {
+   private void parseTransportExecutor(final XMLExtendedStreamReader reader,
+                                       final ExecutorFactoryConfigurationBuilder builder, ClassLoader classLoader) throws XMLStreamException {
       for (int i = 0; i < reader.getAttributeCount(); i++) {
          ParseUtils.requireNoNamespaceAttribute(reader, i);
          String value = replaceProperties(reader.getAttributeValue(i));

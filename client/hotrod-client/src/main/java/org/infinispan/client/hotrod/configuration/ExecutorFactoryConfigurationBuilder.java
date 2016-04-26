@@ -2,7 +2,7 @@ package org.infinispan.client.hotrod.configuration;
 
 import java.util.Properties;
 
-import org.infinispan.client.hotrod.impl.async.DefaultAsyncExecutorFactory;
+import org.infinispan.client.hotrod.impl.executors.DefaultExecutorFactory;
 import org.infinispan.commons.configuration.Builder;
 import org.infinispan.commons.executors.ExecutorFactory;
 import org.infinispan.commons.util.TypedProperties;
@@ -16,7 +16,7 @@ import org.infinispan.commons.util.Util;
  */
 public class ExecutorFactoryConfigurationBuilder extends AbstractConfigurationChildBuilder implements Builder<ExecutorFactoryConfiguration> {
 
-   private Class<? extends ExecutorFactory> factoryClass = DefaultAsyncExecutorFactory.class;
+   private Class<? extends ExecutorFactory> factoryClass = DefaultExecutorFactory.class;
    private ExecutorFactory factory;
    private Properties properties;
    private final ConfigurationBuilder builder;

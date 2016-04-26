@@ -1,7 +1,7 @@
 package org.infinispan.server.test.client.hotrod;
 
-import org.infinispan.client.hotrod.impl.async.DefaultAsyncExecutorFactory;
+import org.infinispan.client.hotrod.impl.executors.DefaultExecutorFactory;
 
-public class HotRodTestExecutorFactory extends DefaultAsyncExecutorFactory {
+public class HotRodTestExecutorFactory extends DefaultExecutorFactory {
 
 }

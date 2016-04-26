@@ -27,7 +27,7 @@ public class ConfigurationTest {
          .addServer()
             .host("host2")
             .port(11222)
-         .asyncExecutorFactory()
+         .executorFactory()
             .factoryClass(SomeAsyncExecutorFactory.class)
          .balancingStrategy(SomeRequestBalancingStrategy.class)
          .connectionPool()
@@ -155,7 +155,7 @@ public class ConfigurationTest {
 
    private void validateConfiguration(Configuration configuration) {
       assertEquals(2, configuration.servers().size());
-      assertEquals(SomeAsyncExecutorFactory.class, configuration.asyncExecutorFactory().factoryClass());
+      assertEquals(SomeAsyncExecutorFactory.class, configuration.executorFactory().factoryClass());
       assertEquals(SomeRequestBalancingStrategy.class, configuration.balancingStrategyClass());
       assertEquals(SomeTransportfactory.class, configuration.transportFactory());
       assertEquals(null, configuration.consistentHashImpl(1));
